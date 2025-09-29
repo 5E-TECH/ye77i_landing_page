@@ -4,12 +4,13 @@ import { Repository } from 'typeorm';
 import { ProjectEntity } from '../../core/entity/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import type { ProjectRepository } from 'src/core/repository/project.repository';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectRepository(ProjectEntity)
-    private readonly projectRepo: Repository<ProjectEntity>,
+    private readonly projectRepo: ProjectRepository,
   ) {}
 
   // CREATE
