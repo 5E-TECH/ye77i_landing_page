@@ -21,7 +21,7 @@ export class UpdateBlogDto {
   })
   @IsOptional()
   @IsString()
-  img_link?: string;
+  img?: string;
 
   @ApiProperty({
     example: '1',

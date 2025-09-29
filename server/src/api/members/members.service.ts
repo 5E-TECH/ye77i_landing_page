@@ -6,6 +6,8 @@ import { UpdateMemberDto } from './dto/update-member.dto';
 import type { MemberRepository } from 'src/core/repository/member.repository';
 import { successRes } from 'src/infrastucture/lib/response/successRes';
 import { catchError } from 'src/infrastucture/lib/response/catchError';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class MembersService {
@@ -14,13 +16,38 @@ export class MembersService {
     private readonly memberRepo: MemberRepository,
   ) {}
 
-  async create(createMemberDto: CreateMemberDto) {
+  private saveFile(file: Express.Multer.File): string | null {
+    if (!file) return null;
+
+    const uploadDir = path.join(__dirname, '../../../uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadDir, file.originalname);
+    fs.writeFileSync(filePath, file.buffer);
+
+    return `/uploads/${file.originalname}`; // DB da saqlanadigan path
+  }
+
+  async create(createMemberDto: CreateMemberDto, file?: Express.Multer.File) {
     try {
-      const member = this.memberRepo.create(createMemberDto);
+      let imageUrl: string | undefined;
+
+      if (file) {
+        imageUrl = this.saveFile(file) ?? undefined;
+      }
+
+
+      const member = this.memberRepo.create({
+        ...createMemberDto,
+        img: imageUrl,
+      });
+
       const saved = await this.memberRepo.save(member);
       return successRes(saved, 201, 'Member created successfully');
     } catch (error) {
-      catchError(error);
+      return catchError(error);
     }
   }
 
@@ -29,14 +56,10 @@ export class MembersService {
       const members = await this.memberRepo.find();
       return successRes(members);
     } catch (error) {
-      catchError(error);
+      return catchError(error);
     }
   }
 
-  /**
-   * findOne for internal use
-   * agar member topilmasa NotFoundException tashlaydi
-   */
   async findOneOrFail(id: string): Promise<MemberEntity> {
     try {
       const member = await this.memberRepo.findOne({ where: { id } });
@@ -58,10 +81,20 @@ export class MembersService {
     }
   }
 
-  async update(id: string, updateMemberDto: UpdateMemberDto) {
+  async update(
+    id: string,
+    updateMemberDto: UpdateMemberDto,
+    file?: Express.Multer.File,
+  ) {
     try {
-      const member = await this.findOneOrFail(id); // TypeScript safe
-      Object.assign(member, updateMemberDto); // entity ustida ishlayapmiz
+      const member = await this.findOneOrFail(id);
+
+      if (file) {
+        member.img = this.saveFile(file);
+      }
+
+      Object.assign(member, updateMemberDto);
+
       const updated = await this.memberRepo.save(member);
       return successRes(updated, 200, 'Member updated successfully');
     } catch (error) {
@@ -71,7 +104,7 @@ export class MembersService {
 
   async remove(id: string) {
     try {
-      const member = await this.findOneOrFail(id); // TypeScript safe
+      const member = await this.findOneOrFail(id);
       await this.memberRepo.remove(member);
       return successRes(null, 200, 'Member removed successfully');
     } catch (error) {

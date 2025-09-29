@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { Binary } from 'typeorm';
 
 export class UpdateMemberDto {
   @ApiProperty({ example: 'Dilshodbek', required: false })
@@ -7,7 +8,7 @@ export class UpdateMemberDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ example: 'https://image.com/dilshod.jpg', required: false })
+  @ApiProperty({ example: 'https://image.com/dilshod.jpg', required: false, format: "binary" })
   @IsOptional()
   @IsString()
   img?: string;

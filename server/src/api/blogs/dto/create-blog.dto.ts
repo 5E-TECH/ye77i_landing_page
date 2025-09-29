@@ -17,7 +17,7 @@ export class CreateBlogDto {
   @ApiProperty({ example: 'https://example.com/blog-cover.png' })
   @IsOptional()
   @IsString()
-  img_link: string;
+  img: string;
 
   @ApiProperty({
     example: '1',
