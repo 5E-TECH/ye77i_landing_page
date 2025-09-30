@@ -8,6 +8,7 @@ import { successRes } from 'src/infrastucture/lib/response/successRes';
 import { catchError } from 'src/infrastucture/lib/response/catchError';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Any } from 'typeorm';
 
 @Injectable()
 export class MembersService {

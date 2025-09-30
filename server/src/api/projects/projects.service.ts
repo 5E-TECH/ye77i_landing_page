@@ -4,47 +4,46 @@ import { Repository } from 'typeorm';
 import { ProjectEntity } from '../../core/entity/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import type { ProjectRepository } from 'src/core/repository/project.repository';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectRepository(ProjectEntity)
-    private readonly projectRepo: ProjectRepository,
+    private readonly projectRepo: Repository<ProjectEntity>,
   ) {}
 
-  // CREATE
-  async create(createProjectDto: CreateProjectDto): Promise<ProjectEntity> {
-    const project = this.projectRepo.create(createProjectDto);
+  async create(createProjectDto: CreateProjectDto, file?: Express.Multer.File) {
+    const project = this.projectRepo.create({
+      ...createProjectDto,
+      img: file ? file.filename : null, // fayl nomini DB ga yozamiz
+    });
     return await this.projectRepo.save(project);
   }
 
-  // FIND ALL
-  async findAll(): Promise<ProjectEntity[]> {
-    return await this.projectRepo.find();
-  }
-
-  // FIND ONE
-  async findOne(id: string): Promise<ProjectEntity> {
-    const project = await this.projectRepo.findOne({ where: { id } });
-    if (!project) {
-      throw new NotFoundException('Project topilmadi');
-    }
-    return project;
-  }
-
-  // UPDATE
   async update(
     id: string,
     updateProjectDto: UpdateProjectDto,
-  ): Promise<ProjectEntity> {
+    file?: Express.Multer.File,
+  ) {
     const project = await this.findOne(id);
     Object.assign(project, updateProjectDto);
+    if (file) {
+      project.img = file.filename;
+    }
     return await this.projectRepo.save(project);
   }
 
-  // REMOVE
-  async remove(id: string): Promise<{ message: string }> {
+  async findAll() {
+    return await this.projectRepo.find();
+  }
+
+  async findOne(id: string) {
+    const project = await this.projectRepo.findOne({ where: { id } });
+    if (!project) throw new NotFoundException('Project topilmadi');
+    return project;
+  }
+
+  async remove(id: string) {
     const project = await this.findOne(id);
     await this.projectRepo.remove(project);
     return { message: 'Project muvaffaqiyatli o‘chirildi' };

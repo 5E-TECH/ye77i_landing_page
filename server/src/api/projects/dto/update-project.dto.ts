@@ -15,10 +15,14 @@ export class UpdateProjectDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 'https://example.com/image.png', required: false })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Project image file',
+  })
   @IsOptional()
-  @IsString()
-  img_link?: string;
+  img?: any;
 
   @ApiProperty({
     example: 'https://github.com/username/project',
@@ -28,3 +32,4 @@ export class UpdateProjectDto {
   @IsString()
   project_link?: string;
 }
+
