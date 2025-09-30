@@ -11,7 +11,7 @@ export class ProjectEntity extends BaseEntity {
   description: string;
 
   @Column({ type: 'varchar', nullable: true })
-  img_link: string; // rasm URL
+  img: string | null; // rasm URL
 
   @Column({ type: 'varchar' })
   project_link: string; // project link

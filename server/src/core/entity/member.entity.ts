@@ -6,8 +6,8 @@ export class MemberEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })
-  img: string;
+  @Column({ type: 'varchar', nullable: true })
+  img: string | null;
 
   @Column({ type: 'varchar' })
   bio: string;

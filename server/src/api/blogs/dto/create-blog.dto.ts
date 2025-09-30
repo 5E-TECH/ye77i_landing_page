@@ -14,10 +14,14 @@ export class CreateBlogDto {
   @IsString()
   content: string;
 
-  @ApiProperty({ example: 'https://example.com/blog-cover.png' })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary', // ✅ Fayl sifatida Swaggerda chiqadi
+    required: false,
+    description: 'Blog cover rasmi',
+  })
   @IsOptional()
-  @IsString()
-  img_link: string;
+  img?: any; // ⚡ validator ishlatilmaydi
 
   @ApiProperty({
     example: '1',

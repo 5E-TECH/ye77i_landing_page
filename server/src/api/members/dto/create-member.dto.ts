@@ -1,16 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateMemberDto {
   @ApiProperty({ example: 'Dilshodbek' })
   @IsOptional()
   @IsString()
   name: string;
-
-  @ApiProperty({ example: 'https://image.com/dilshod.jpg' })
-  @IsOptional()
-  @IsString()
-  img: string;
 
   @ApiProperty({ example: 'Backend developer' })
   @IsOptional()

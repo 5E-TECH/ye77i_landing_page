@@ -2,17 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, HttpStatus } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express'; // 👈 qo'shildi
+import { join } from 'path';
 
 export default class Application {
   public static async main(): Promise<void> {
-    const app = await NestFactory.create(AppModule, {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       bufferLogs: true,
     });
 
-    app.useLogger(['error', 'warn', 'debug', 'log']); 
+    app.useLogger(['error', 'warn', 'debug', 'log']);
 
     // Global filters, pipes, cors
-
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -34,6 +35,11 @@ export default class Application {
 
     const document = SwaggerModule.createDocument(app, configSwagger);
     SwaggerModule.setup(api, app, document);
+
+    // Static files
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+      prefix: '/uploads/',
+    });
 
     // Start
     const PORT = process.env.PORT || 3000;

@@ -16,12 +16,13 @@ export class UpdateBlogDto {
   content?: string;
 
   @ApiProperty({
-    example: 'https://example.com/blog-cover.png',
+    type: 'string',
+    format: 'binary', // ✅ Swaggerda fayl yuklash ko‘rinadi
     required: false,
+    description: 'Blog cover rasmi',
   })
   @IsOptional()
-  @IsString()
-  img_link?: string;
+  img?: any;
 
   @ApiProperty({
     example: '1',

@@ -10,8 +10,8 @@ export class BlogEntity extends BaseEntity {
   @Column({ type: 'text' })
   content: string;
 
-  @Column({ type: 'varchar' })
-  img_link: string; // cover image
+  @Column({ type: 'varchar', nullable: true })
+  img: string | null; // cover image
 
   @Column({ type: 'varchar' })
   project_id: string;
