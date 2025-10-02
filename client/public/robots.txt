@@ -1,0 +1,13 @@
+# robots.txt for ye77i.uz
+
+User-agent: *
+Allow: /
+
+# Block Next.js internal files and folders
+Disallow: /_next/
+Disallow: /api/
+Disallow: /static/
+Disallow: /server-sitemap.xml
+
+# Sitemap link
+Sitemap: https://ye77i.uz/sitemap.xml

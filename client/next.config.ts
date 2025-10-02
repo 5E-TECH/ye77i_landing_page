@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["ye77i.uz"], // sening domening
+  },
 };
 
 export default nextConfig;

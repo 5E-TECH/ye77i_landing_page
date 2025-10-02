@@ -1,30 +1,52 @@
-import React from 'react'
+import React from "react";
+
 
 const Hero = () => {
-    return (
-        <div className="@container">
-            <div className="@[480px]:p-4">
-                <div
-                    className="flex min-h-[70vh] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 rounded-xl items-start justify-end px-4 pb-10 @[480px]:px-10"
-                    style={{
-                        backgroundImage:
-                            'linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBt7eIz8f9leEaNAaU1jqsfp0LpCAYYGJelXRIXB3lijHjsX8MLGkxWCnEFgY1aHCHX5aiidqSFXCCZT8-EXN3htJi8stn06sU2SomZFjI9IJbZrBpxLjgqH1NVKmYla5XIqMSDC1IereZ0JXbmVzzGU1ckb-se6lzc51_4YG5ySZxclZNB8vsBJpdD7Uwjmttc4VigKa58fXKOkT3YgxIA4cR89di8-eCD2d3PGWohmwfsIqOxvh668lX-JWJpXq2HdUqZwS8wQyA")'
-                    }}>
-                    <div className="flex flex-col gap-4 text-left">
-                        <h1 className="text-white text-4xl font-black md:text-5xl">Innovating the Future of Technology</h1>
-                        <p className="text-slate-200 text-sm md:text-base max-w-2xl">YE77I is a leading technology company
-                            dedicated to providing cutting-edge solutions and exceptional service. We specialize in full-stack
-                            development, mobile applications, and AI, delivering tailored solutions to meet your unique needs.
-                        </p>
-                    </div>
-                    <button
-                        className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-base font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all">
-                        <span className="truncate">Explore Our Services</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    )
-}
+  return (
+    <section className="@container">
+      <div className="@[480px]:p-4">
+        <div
+          className="flex min-h-[90vh] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-10 rounded-3xl items-center justify-center px-6 pb-20 @[480px]:px-14 relative overflow-hidden"
+          style={{
+            backgroundImage:
+              "url('/ye77i.jpg')", // fon uchun premium surat
+          }}
+        >
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#040e4b]/95 via-[#0F0F31]/80 to-[#0065FE]/70 rounded-3xl"></div>
 
-export default React.memo(Hero)
+          {/* Big background text watermark */}
+          {/* <h1 className="absolute inset-0 flex items-center justify-center text-white/5 text-[160px] md:text-[260px] font-extrabold tracking-widest z-0 select-none">
+            YE77I
+          </h1> */}
+
+          {/* Content */}
+          <div className="relative flex flex-col items-center gap-6 text-center z-10">
+            {/* Brand title premium */}
+            <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-[#0065FE] via-[#4fc3f7] to-[#7b61ff] text-5xl md:text-7xl font-extrabold tracking-wider leading-tight drop-shadow-lg">
+              YE77I
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-white/80 text-base md:text-xl max-w-2xl leading-relaxed">
+              Innovating the Future of Technology with cutting-edge software
+              solutions, full-stack development, and next-generation AI.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4 mt-4">
+              <button className="h-12 px-8 rounded-xl bg-gradient-to-r from-[#0065FE] via-[#4fc3f7] to-[#7b61ff] text-white text-base font-semibold shadow-lg hover:opacity-90 transition-all">
+                Explore Services
+              </button>
+              <button className="h-12 px-8 rounded-xl border border-white/30 text-white text-base font-semibold hover:bg-white/10 transition-all">
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default React.memo(Hero);

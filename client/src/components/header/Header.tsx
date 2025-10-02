@@ -1,35 +1,47 @@
-import React from 'react'
+import React from "react";
 
 const Header = () => {
-    return (
-        <header
-            className="flex items-center justify-between whitespace-nowrap border-b border-primary/20 dark:border-primary/30 px-10 py-3">
-            <div className="flex items-center gap-4 text-slate-900 dark:text-white">
-                <div className="size-6 text-primary">
-                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
-                    </svg>
-                </div>
-                <h2 className="text-slate-900 dark:text-white text-lg font-bold">YE77I</h2>
-            </div>
-            <div className="hidden md:flex flex-1 justify-end gap-8">
-                <div className="flex items-center gap-6">
-                    <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors"
-                        href="#">About Us</a>
-                    <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors"
-                        href="#">Services</a>
-                    <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors"
-                        href="#">Team</a>
-                    <a className="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors"
-                        href="#">Contact</a>
-                </div>
-                <button
-                    className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
-                    <span className="truncate">Get Started</span>
-                </button>
-            </div>
-        </header>
-    )
-}
+  return (
+    <header className="flex items-center justify-between px-10 py-4 border-b border-[#1a1a3d] 
+      bg-gradient-to-r from-[#040e4b] via-[#0F0F31] to-[#043072] shadow-md">
+      {/* Logo */}
+      <div className="flex items-center gap-3 text-white">
+        <div className="size-7 text-[#0065FE]">
+          <svg
+            fill="none"
+            viewBox="0 0 48 48"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 6H42L36 24L42 42H6L12 24L6 6Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+        </div>
+        <h2 className="text-lg font-bold tracking-wide">YE77I</h2>
+      </div>
 
-export default React.memo(Header)
+      {/* Navbar links */}
+      <div className="hidden md:flex flex-1 justify-end gap-10">
+        <nav className="flex items-center gap-8">
+          {["About Us", "Services", "Team", "Contact"].map((item, i) => (
+            <a
+              key={i}
+              href="#"
+              className="relative text-white/80 text-sm font-medium transition-colors hover:text-white after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-[#0065FE] hover:after:w-full after:transition-all after:duration-300"
+            >
+              {item}
+            </a>
+          ))}
+        </nav>
+
+        {/* CTA Button */}
+        <button className="flex items-center justify-center h-10 px-5 rounded-lg bg-[#0065FE] text-white text-sm font-semibold shadow-lg shadow-[#0065FE]/30 hover:bg-[#0056d6] transition-all">
+          Get Started
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default React.memo(Header);
