@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title:
+  title: 
     "YE77I Tech — IT xizmatlari, biznesni avtomatlashtirish va raqamlashtirish",
   description:
     "YE77I Tech kompaniyasi — biznesingizni rivojlantirish uchun IT xizmatlari, ERP va CRM tizimlari, veb-sayt va mobil ilovalar yaratish, avtomatlashtirish hamda raqamlashtirish bo‘yicha professional yechimlar taqdim etadi.",
@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     "veb sayt yaratish",
     "dasturlash",
     "YE77I Tech",
+    "YETTI Tech",
+    "7 it",
+    "7 tech",
+    "7",
+    "yetti it",
+    "yettilik",
+    "Yetti",
     "raqamli yechimlar",
     "biznesni optimallashtirish",
     "AI yechimlar",
