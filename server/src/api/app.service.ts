@@ -1,9 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe, HttpStatus } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express'; // 👈 qo'shildi
+import {
+  ClassSerializerInterceptor,
+  HttpStatus,
+  ValidationPipe,
+} from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { Reflector } from '@nestjs/core';
+import config from 'src/config';
 
 export default class Application {
   public static async main(): Promise<void> {
@@ -18,32 +24,36 @@ export default class Application {
       new ValidationPipe({
         whitelist: true,
         forbidNonWhitelisted: true,
+        transform: true,
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       }),
     );
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+    app.enableCors({
+      origin: true,
+      credentials: true,
+    });
 
-    // Prefix & Swagger
-    const api = 'api/v1';
-    app.setGlobalPrefix(api);
+    const apiPrefix = 'api/v1';
+    app.setGlobalPrefix(apiPrefix);
 
     const configSwagger = new DocumentBuilder()
-      .setTitle('Post Control System API')
-      .setDescription('API for post delivery management')
-      .setVersion('1.0.0')
+      .setTitle('Ye77i Landing API')
+      .setDescription('Production-ready API for Ye77i landing page')
+      .setVersion('2.0.0')
       .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, configSwagger);
-    SwaggerModule.setup(api, app, document);
+    SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
 
-    // Static files
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
       prefix: '/uploads/',
     });
 
-    // Start
-    const PORT = process.env.PORT || 3000;
-    await app.listen(PORT);
+    const PORT = config.PORT;
+    await app.listen(PORT, '0.0.0.0');
     console.log(`🚀 Server running on http://localhost:${PORT}`, 'Bootstrap');
+    console.log(`📘 Swagger: http://localhost:${PORT}/${apiPrefix}/docs`, 'Bootstrap');
   }
 }

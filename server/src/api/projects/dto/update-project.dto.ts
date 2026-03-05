@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class UpdateProjectDto {
   @ApiProperty({ example: 'Portfolio Website', required: false })
@@ -29,7 +29,6 @@ export class UpdateProjectDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsUrl()
   project_link?: string;
 }
-

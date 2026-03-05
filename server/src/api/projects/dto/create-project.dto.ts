@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({ example: 'Portfolio Website' })
@@ -20,6 +20,6 @@ export class CreateProjectDto {
   img?: any; // 🔥 Fayl uchun 'binary'
 
   @ApiProperty({ example: 'https://github.com/username/project' })
-  @IsString()
+  @IsUrl()
   project_link: string;
 }

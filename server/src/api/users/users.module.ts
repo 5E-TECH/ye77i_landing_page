@@ -12,5 +12,6 @@ import { BcryptCompare } from 'src/infrastucture/lib/bcrypt/encrypt';
   ])],
   controllers: [UsersController],
   providers: [UsersService, BcryptEncryption, BcryptCompare],
+  exports: [UsersService],
 })
 export class UsersModule {}

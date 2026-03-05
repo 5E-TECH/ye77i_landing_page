@@ -15,12 +15,12 @@ export class MemberEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   position: string;
 
-  @Column({ type: 'varchar' })
-  github: string;
+  @Column({ type: 'varchar', nullable: true })
+  github: string | null;
 
-  @Column({ type: 'varchar' })
-  instagram: string;
+  @Column({ type: 'varchar', nullable: true })
+  instagram: string | null;
 
-  @Column({ type: 'varchar' })
-  linkedin: string;
+  @Column({ type: 'varchar', nullable: true })
+  linkedin: string | null;
 }

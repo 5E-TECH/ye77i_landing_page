@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { BlogEntity } from '../../core/entity/blog.entity';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
-import * as fs from 'fs';
-import * as path from 'path';
+import { removeUploadedFile } from 'src/common/utils/upload-file.util';
 
 @Injectable()
 export class BlogsService {
@@ -14,27 +13,15 @@ export class BlogsService {
     private readonly blogRepo: Repository<BlogEntity>,
   ) {}
 
-  private saveFile(file: Express.Multer.File): string {
-    const uploadDir = path.join(__dirname, '../../../uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const filePath = path.join(uploadDir, file.originalname);
-    fs.writeFileSync(filePath, file.buffer);
-
-    return `/uploads/${file.originalname}`; // DB ga yoziladigan path
-  }
-
   // CREATE
   async create(
     createBlogDto: CreateBlogDto,
     file?: Express.Multer.File,
   ): Promise<BlogEntity> {
-    if (file) {
-      createBlogDto.img = this.saveFile(file);
-    }
-    const blog = this.blogRepo.create(createBlogDto);
+    const blog = this.blogRepo.create({
+      ...createBlogDto,
+      img: file ? `/uploads/blogs/${file.filename}` : null,
+    });
     return await this.blogRepo.save(blog);
   }
 
@@ -66,7 +53,8 @@ export class BlogsService {
     const blog = await this.findOne(id);
 
     if (file) {
-      updateBlogDto.img = this.saveFile(file);
+      removeUploadedFile(blog.img);
+      Object.assign(blog, { img: `/uploads/blogs/${file.filename}` });
     }
 
     Object.assign(blog, updateBlogDto);
@@ -76,6 +64,7 @@ export class BlogsService {
   // REMOVE
   async remove(id: string): Promise<{ message: string }> {
     const blog = await this.findOne(id);
+    removeUploadedFile(blog.img);
     await this.blogRepo.remove(blog);
     return { message: 'Blog muvaffaqiyatli o‘chirildi' };
   }

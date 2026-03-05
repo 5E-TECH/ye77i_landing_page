@@ -1,6 +1,7 @@
 // update-user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
+import { IsString, IsEmail, MinLength, IsOptional, IsEnum } from 'class-validator';
+import { UserRole } from 'src/core/entity/user.entity';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -30,4 +31,13 @@ export class UpdateUserDto {
   @IsString()
   @MinLength(6, { message: 'Parol kamida 6 ta belgidan iborat bo‘lishi kerak' })
   password?: string;
+
+  @ApiProperty({
+    enum: UserRole,
+    required: false,
+    description: 'User roli',
+  })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
 }

@@ -8,12 +8,17 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { imageUploadOptions } from 'src/common/utils/upload-file.util';
+import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/core/entity/user.entity';
 
 @ApiTags('blogs')
 @Controller('blogs')
@@ -21,29 +26,11 @@ export class BlogsController {
   constructor(private readonly blogsService: BlogsService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file', imageUploadOptions('blogs')))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: 'NestJS Best Practices' },
-        content: {
-          type: 'string',
-          example: 'Bu blogda NestJS bo‘yicha amaliy maslahatlar beriladi',
-        },
-        img: { type: 'string', example: 'https://example.com/image.png' },
-        project_id: {
-          type: 'string',
-          example: 'fe6c53a3-c41e-4dd7-b2b9-03122dd160df',
-        },
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
+  @ApiBody({ type: CreateBlogDto })
   create(
     @Body() dto: CreateBlogDto,
     @UploadedFile() file?: Express.Multer.File,
@@ -51,39 +38,26 @@ export class BlogsController {
     return this.blogsService.create(dto, file);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.blogsService.findAll();
   }
 
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.blogsService.findOne(id);
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('file', imageUploadOptions('blogs')))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string', example: 'Updated blog title' },
-        content: { type: 'string', example: 'Updated blog content' },
-        img: { type: 'string', example: 'https://example.com/image.png' },
-        project_id: {
-          type: 'string',
-          example: 'fe6c53a3-c41e-4dd7-b2b9-03122dd160df',
-        },
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
+  @ApiBody({ type: UpdateBlogDto })
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateBlogDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
@@ -91,7 +65,9 @@ export class BlogsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.blogsService.remove(id);
   }
 }

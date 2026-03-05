@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class UpdateMemberDto {
   @ApiProperty({ example: 'Dilshodbek', required: false })
@@ -19,16 +19,16 @@ export class UpdateMemberDto {
 
   @ApiProperty({ example: 'https://github.com/dilshod', required: false })
   @IsOptional()
-  @IsString()
+  @IsUrl()
   github?: string;
 
   @ApiProperty({ example: 'https://instagram.com/dilshod', required: false })
   @IsOptional()
-  @IsString()
+  @IsUrl()
   instagram?: string;
 
   @ApiProperty({ example: 'https://linkedin.com/in/dilshod', required: false })
   @IsOptional()
-  @IsString()
+  @IsUrl()
   linkedin?: string;
 }

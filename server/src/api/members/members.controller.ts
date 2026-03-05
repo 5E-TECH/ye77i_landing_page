@@ -8,19 +8,27 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
-import { ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiBody, ApiTags } from '@nestjs/swagger';
+import { imageUploadOptions } from 'src/common/utils/upload-file.util';
+import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/core/entity/user.entity';
 
+@ApiTags('Members')
 @Controller('members')
 export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('img'))
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('img', imageUploadOptions('members')))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -35,41 +43,47 @@ export class MembersController {
           type: 'string',
           example: 'https://linkedin.com/in/dilshod',
         },
-        img: { type: 'string', format: 'binary' }, // 🔑 shu joy fayl uchun
+        img: { type: 'string', format: 'binary' },
       },
     },
   })
   create(
     @Body() createMemberDto: CreateMemberDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.membersService.create(createMemberDto, file);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.membersService.findAll();
   }
 
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.membersService.findOne(id);
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('img'))
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor('img', imageUploadOptions('members')))
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateMemberDto })
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateMemberDto: UpdateMemberDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.membersService.update(id, updateMemberDto, file);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.membersService.remove(id);
   }
 }

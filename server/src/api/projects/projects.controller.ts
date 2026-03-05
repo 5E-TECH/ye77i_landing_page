@@ -8,85 +8,67 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { imageUploadOptions } from 'src/common/utils/upload-file.util';
+import { Public } from 'src/common/decorators/public.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/core/entity/user.entity';
 
-@ApiTags('Projects') // Swagger’da grouping uchun
+@ApiTags('Projects')
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  // CREATE
   @Post()
-  @ApiConsumes('multipart/form-data') // 🔥 Swagger fayl yuklashni ko‘rsatishi uchun
-  @ApiBody({ type: CreateProjectDto }) // 🔥 DTO ni Swagger’da to‘g‘ri ko‘rsatadi
-  @UseInterceptors(
-    FileInterceptor('img', {
-      storage: diskStorage({
-        destination: './uploads/projects',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `project-${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateProjectDto })
+  @UseInterceptors(FileInterceptor('img', imageUploadOptions('projects')))
   create(
     @Body() createProjectDto: CreateProjectDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.projectsService.create(createProjectDto, file);
   }
 
-  // FIND ALL
+  @Public()
   @Get()
   findAll() {
     return this.projectsService.findAll();
   }
 
-  // FIND ONE
+  @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.projectsService.findOne(id);
   }
 
-  // UPDATE
   @Patch(':id')
-  @ApiConsumes('multipart/form-data') // 🔥 Fayl yuklash uchun
-  @ApiBody({ type: UpdateProjectDto }) // 🔥 Swagger’da DTO form
-  @UseInterceptors(
-    FileInterceptor('img', {
-      storage: diskStorage({
-        destination: './uploads/projects',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `project-${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateProjectDto })
+  @UseInterceptors(FileInterceptor('img', imageUploadOptions('projects')))
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateProjectDto: UpdateProjectDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.projectsService.update(id, updateProjectDto, file);
   }
 
-  // REMOVE
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.projectsService.remove(id);
   }
 }

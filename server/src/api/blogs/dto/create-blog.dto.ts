@@ -1,33 +1,30 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateBlogDto {
   @ApiProperty({ example: 'NestJS Best Practices' })
-  @IsOptional()
   @IsString()
   title: string;
 
   @ApiProperty({
     example: 'Bu blogda NestJS bo‘yicha amaliy maslahatlar beriladi',
   })
-  @IsOptional()
   @IsString()
   content: string;
 
   @ApiProperty({
     type: 'string',
-    format: 'binary', // ✅ Fayl sifatida Swaggerda chiqadi
+    format: 'binary',
     required: false,
-    description: 'Blog cover rasmi',
+    description: 'Blog cover image',
   })
   @IsOptional()
-  img?: any; // ⚡ validator ishlatilmaydi
+  file?: any;
 
   @ApiProperty({
-    example: '1',
+    example: 'fe6c53a3-c41e-4dd7-b2b9-03122dd160df',
     description: 'Blog qaysi projectga tegishli ekanligi',
   })
-  @IsOptional()
-  @IsString()
+  @IsUUID()
   project_id: string;
 }

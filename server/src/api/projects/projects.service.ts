@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { ProjectEntity } from '../../core/entity/project.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { removeUploadedFile } from 'src/common/utils/upload-file.util';
 
 @Injectable()
 export class ProjectsService {
@@ -15,7 +16,7 @@ export class ProjectsService {
   async create(createProjectDto: CreateProjectDto, file?: Express.Multer.File) {
     const project = this.projectRepo.create({
       ...createProjectDto,
-      img: file ? file.filename : null, // fayl nomini DB ga yozamiz
+      img: file ? `/uploads/projects/${file.filename}` : null,
     });
     return await this.projectRepo.save(project);
   }
@@ -28,7 +29,8 @@ export class ProjectsService {
     const project = await this.findOne(id);
     Object.assign(project, updateProjectDto);
     if (file) {
-      project.img = file.filename;
+      removeUploadedFile(project.img);
+      project.img = `/uploads/projects/${file.filename}`;
     }
     return await this.projectRepo.save(project);
   }
@@ -45,6 +47,7 @@ export class ProjectsService {
 
   async remove(id: string) {
     const project = await this.findOne(id);
+    removeUploadedFile(project.img);
     await this.projectRepo.remove(project);
     return { message: 'Project muvaffaqiyatli o‘chirildi' };
   }

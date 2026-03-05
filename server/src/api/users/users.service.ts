@@ -8,11 +8,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserEntity } from '../../core/entity/user.entity';
+import { UserEntity, UserRole } from '../../core/entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BcryptEncryption } from '../../infrastucture/lib/bcrypt/bcrypt';
 import { BcryptCompare } from '../../infrastucture/lib/bcrypt/encrypt';
+import config from 'src/config';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -27,8 +28,8 @@ export class UsersService implements OnModuleInit {
 
   // 🚀 Modul ishga tushganda admin yaratish
   async onModuleInit() {
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminEmail = config.ADMIN_EMAIL;
+    const adminPassword = config.ADMIN_PASSWORD;
 
     if (!adminEmail || !adminPassword) {
       this.logger.warn('⚠️ ADMIN_EMAIL yoki ADMIN_PASSWORD .env da topilmadi');
@@ -45,6 +46,7 @@ export class UsersService implements OnModuleInit {
         name: 'Admin',
         email: adminEmail,
         password: hashedPassword,
+        role: UserRole.ADMIN,
       });
       await this.userRepo.save(admin);
 
@@ -62,8 +64,13 @@ export class UsersService implements OnModuleInit {
     if (existingUser) throw new BadRequestException('Email allaqachon mavjud');
 
     const hashedPassword = await this.bcryptEncrypt.encrypt(dto.password);
-    const user = this.userRepo.create({ ...dto, password: hashedPassword });
-    return await this.userRepo.save(user);
+    const user = this.userRepo.create({
+      ...dto,
+      password: hashedPassword,
+      role: dto.role ?? UserRole.EDITOR,
+    });
+    const saved = await this.userRepo.save(user);
+    return this.findOne(saved.id);
   }
 
   // FIND ALL
@@ -81,11 +88,22 @@ export class UsersService implements OnModuleInit {
   // UPDATE
   async update(id: string, dto: UpdateUserDto): Promise<UserEntity> {
     const user = await this.findOne(id);
+
+    if (dto.email && dto.email !== user.email) {
+      const existingUser = await this.userRepo.findOne({
+        where: { email: dto.email },
+      });
+      if (existingUser) {
+        throw new BadRequestException('Email allaqachon mavjud');
+      }
+    }
+
     if (dto.password) {
       dto.password = await this.bcryptEncrypt.encrypt(dto.password);
     }
     Object.assign(user, dto);
-    return await this.userRepo.save(user);
+    await this.userRepo.save(user);
+    return this.findOne(id);
   }
 
   // DELETE
@@ -95,10 +113,28 @@ export class UsersService implements OnModuleInit {
     return { message: 'User muvaffaqiyatli o‘chirildi' };
   }
 
-  // CHECK PASSWORD (login uchun)
-  async checkPassword(email: string, password: string): Promise<boolean> {
-    const user = await this.userRepo.findOne({ where: { email } });
-    if (!user) throw new NotFoundException('User topilmadi');
-    return await this.bcryptCompare.compare(password, user.password);
+  async validateCredentials(
+    email: string,
+    password: string,
+  ): Promise<UserEntity | null> {
+    const user = await this.userRepo
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
+
+    if (!user) {
+      return null;
+    }
+
+    const isValid = await this.bcryptCompare.compare(password, user.password);
+    if (!isValid) {
+      return null;
+    }
+
+    const { password: _password, ...safeUser } = user as UserEntity & {
+      password: string;
+    };
+    return safeUser as UserEntity;
   }
 }
